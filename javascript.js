@@ -1,46 +1,89 @@
+
+const choicesContainer = document.getElementById('choices');
+const playerScoreDisplay = document.getElementById('player-score');
+const computerScoreDisplay = document.getElementById('computer-score');
+const resultDisplay = document.getElementById('result');
+const resetButton = document.getElementById('reset-btn');
+
+let playerScore = 0;
+let computerScore = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const choices = ['Rock', 'Paper', 'Scissors'];
+    choices.forEach(createButton);
+});
+
+function createButton(choice) {
+    const button = document.createElement('button');
+    button.textContent = choice;
+    button.addEventListener('click', () => playRound(choice, getComputerChoice()));
+    choicesContainer.appendChild(button);
+}
+
+function updateScore() {
+    playerScoreDisplay.textContent = playerScore;
+    computerScoreDisplay.textContent = computerScore;
+}
+
+function displayResult(result) {
+    resultDisplay.textContent = result;
+}
+
+function resetGame() {
+    playerScore = 0;
+    computerScore = 0;
+    updateScore();
+    displayResult('');
+    const buttons = document.querySelectorAll('#choices button');
+    buttons.forEach(button => {
+        button.disabled = false;
+    });
+}
+
+resetButton.addEventListener('click', resetGame);
+
 function getComputerChoice() {
-    const choices = ["rock", "paper", "scissors"];
+    const choices = ['rock', 'paper', 'scissors'];
     const randomIndex = Math.floor(Math.random() * choices.length);
     return choices[randomIndex];
 }
 
-function getHumanChoice() {
-    let choice = prompt("Enter Rock, Paper, or Scissors:").toLowerCase();
-    while (choice !== "rock" && choice !== "paper" && choice !== "scissors") {
-        choice = prompt("Invalid choice. Please enter Rock, Paper, or Scissors:").toLowerCase();
-    }
-    return choice;
+const wins = {
+    rock: 'scissors',
+    paper: 'rock',
+    scissors: 'paper'
 }
 
-let humanScore = 0;
-let computerScore = 0;
-
 function playRound(humanChoice, computerChoice) {
-    humanChoice = humanChoice.toLowerCase(); //this makes certain it is case-insensitive
-    console.log(`You chose ${humanChoice}`);
-    console.log(`The computer choose ${computerChoice}`);
+    humanChoice = humanChoice.toLowerCase();
+    const result = humanChoice === computerChoice ? "It's a tie!" :
+                   wins[humanChoice] === computerChoice ? "You win!" : "You lose!";
+    displayResult(`You chose ${humanChoice}. The computer chose ${computerChoice}. ${result}`);
 
-    if (humanChoice === computerChoice) {
-        console.log("It's a tie!")
-    } else if (
-        (humanChoice === "rock" && computerChoice === "scissors") ||
-        (humanChoice === "paper" && computerChoice === "rock") ||
-        (humanChoice === "scissors" && computerChoice === "paper")
-    ) {
-        console.log("You are a WINNER!!!");
-        humanScore++;
-    } else {
-    console.log("Computer wins, hope you didn't have money on that!")
-    computerScore++;
-        }
+    if (result === "You win!") {
+        playerScore++;
+    } else if (result === "You lose!") {
+        computerScore++;
     }
 
-    function playGame() {
-        for (let i = 0; i < 5; i++) {
-            const humanChoice = getHumanChoice();
-            const computerChoice = getComputerChoice();
-            playRound(humanChoice, computerChoice);
-        }
-        console.log(`Final scores - Human: ${humanScore}, Computer: ${computerScore}`);
-        }
-    playGame();
+    updateScore();
+    if (playerScore === 5 || computerScore === 5) {
+        endGame();
+    }
+}
+
+function endGame() {
+    if (playerScore >= computerScore) {
+        displayResult("Winner Winner Turkey and a Big Fat Steak Dinner!");
+    } else {
+        displayResult("CLOSE BUT NO CIGAR!");
+    }
+    const buttons = document.querySelectorAll('#choices button');
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+}
+
+       
+  
+
